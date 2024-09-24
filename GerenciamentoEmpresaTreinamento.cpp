@@ -9,6 +9,73 @@ struct Cidade {
 	string UF;
 };
 
+struct Curso {
+	int cod_curso;
+	string descricao;
+	string valor_por_aula;
+};
+
+struct endCurso {
+	int cod_curso;
+	int end_curso;
+};
+
+struct Turma {
+	int cod_turma;
+	int cod_curso;
+	int cod_instrutor_turma;
+	int total_participantes;
+	int quant_max_participantes;
+};
+
+struct endTurma {
+	int cod_turma;
+	int end_turma;
+};
+
+struct indice_instrutor {
+	int codigo;
+	int ender;
+};
+
+struct Instrutores {
+	int cod_instrutor;
+	string nome;
+	string endereco;
+	int cod_cidade;
+	int status;
+};
+
+struct Matricula {
+	int cod_matricula;
+	int cod_aluno;
+	int cod_turma;
+	int quant_aulas;
+	double valor_total;
+	int status;
+};
+
+struct endMatricula {
+	int cod_matricula;
+	int end_matricula;
+};
+
+struct Aluno {
+	int cod_aluno;
+	string nome;
+	string endereco;
+	int cod_cidade;
+	int status;
+};
+
+struct endAluno {
+	int codigo;
+	int ender;
+};
+
+
+//CIDADE =====================================================
+
 void leitura_cidade(struct Cidade cid[], int &cont) {
 	int i = 0;
 	for (int saida = 1; i < 20 && saida != 0; i++) {
@@ -25,18 +92,9 @@ void leitura_cidade(struct Cidade cid[], int &cont) {
 	cont = i - 1;
 }
 
-//==========================================================
+//CURSO =====================================================
 
-struct Curso {
-	int cod_curso;
-	string descricao;
-	string valor_por_aula;
-};
 
-struct endCurso {
-	int cod_curso;
-	int end_curso;
-};
 
 void leitura_curso(struct Curso curs[], int &cont) {
 	int i = 0;
@@ -63,20 +121,7 @@ void leitura_indice_curso (struct endCurso cur[], int cont) {
 	}
 }
 
-//==========================================================
-
-struct Turma {
-	int cod_turma;
-	int cod_curso;
-	int cod_instrutor_turma;
-	int total_participantes;
-	int quant_max_participantes;
-};
-
-struct endTurma {
-	int cod_turma;
-	int end_turma;
-};
+//TURMA =====================================================
 
 void buscar_cursos(struct Curso cur[], int &cont, int cod_curso) {
 	for(int i = 0; i < cont; i++) {
@@ -91,8 +136,20 @@ void buscar_cursos(struct Curso cur[], int &cont, int cod_curso) {
 	}
 }
 
+void buscar_instrutor(struct Instrutores intr[], int &cont, int cod_instrutor, struct Cidade cid[]) {
+	for(int i = 0; i < cont; i++) {
+		if(cod_instrutor == intr[i].cod_instrutor) {
+			cout << "\n** INSTRUTOR **" << endl;
+			cout << "Nome: " << intr[i].nome << endl;
+			cout << "Cidade: " << cid[i].nome << endl;
+		}
+		else {
+			cout << "\n** CÓDIGO DIGITADO NÃO EXISTE! **.";
+		}
+	}
+}
 
-void leitura_turmas(struct Turma tur[], int &cont, struct Curso cur[], int &cont_curso) {
+void leitura_turmas(struct Turma tur[], int &cont, struct Curso cur[], int &cont_curso, struct Instrutores intr[], int &cont_instrutor, struct Cidade cid[]) {
 	int i = 0;
 	for (int saida = 1; i < 20 && saida != 0; i++) {
 		cout << "\n\nCódigo da turma: ";
@@ -108,6 +165,7 @@ void leitura_turmas(struct Turma tur[], int &cont, struct Curso cur[], int &cont
 			cin >> tur[i].quant_max_participantes;
 			
 			buscar_cursos(cur, cont_curso, tur[i].cod_curso);
+			buscar_instrutor(intr,cont_instrutor, intr[i].cod_instrutor, cid);
 		}
 		else saida = 0;
 	}
@@ -123,7 +181,7 @@ void leitura_indice_turma (struct endTurma idx[], int cont){
     }
 }
 
-void inclusao_turma (struct Turma tur[], int &cont, struct endTurma idx[], int contT, int cod){
+void inclusao_turma (struct Turma tur[], int &cont, struct endTurma idx[], int contT, int cod, struct Curso cur[], int &cont_curso, struct Instrutores intr[], int &cont_instrutor, struct Cidade cid[]){
     // inclusao do novo registro na area de dados
     cout << "Código da turma: ";
     cin >> tur[cont].cod_turma;
@@ -136,6 +194,8 @@ void inclusao_turma (struct Turma tur[], int &cont, struct endTurma idx[], int c
     cout << "Quantidade máxima de participantes: ";
     cin >> tur[cont].quant_max_participantes;
     
+    buscar_cursos(cur, cont_curso, tur[cont].cod_curso);
+	buscar_instrutor(intr,cont_instrutor, intr[cont].cod_instrutor, cid);
     
     // inclusao na area de indices
     int i;
@@ -152,20 +212,7 @@ void inclusao_turma (struct Turma tur[], int &cont, struct endTurma idx[], int c
     contT++;
 }
 
-//==========================================================
-
-struct indice_instrutor {
-	int codigo;
-	int ender;
-};
-
-struct Instrutores {
-	int cod_instrutor;
-	string nome;
-	string endereco;
-	int cod_cidade;
-	int status;
-};
+//INSTRUTOR ==================================================
 
 void buscar_cidades(struct Cidade cid[], int &cont, int cod_cidade) {
 	for(int i = 0; i < cont; i++) {
@@ -211,7 +258,6 @@ void leitura_indice_instrutor (struct indice_instrutor idx[], int contT){
     }
 }
 
-
 void inclusao_instrutores (struct Instrutores intr[], int &cont, struct indice_instrutor idx[], int contT, int cod, struct Cidade cid[], int &cont_cidades){
     // inclusao do novo registro na area de dados
     cout << "Código do instrutor: ";
@@ -243,7 +289,7 @@ void inclusao_instrutores (struct Instrutores intr[], int &cont, struct indice_i
 }
 
 void busca_aleat_instrutor (struct Instrutores intr[], int &cont, struct indice_instrutor idxT[], int contT, int cod, struct Cidade cid[], int &cont_cidades){
-    int i = 0, f = cont-1;
+    int i = 0, f = cont - 1;
     int m = (i + f) / 2;
     for (; f >= i && cod != intr[m].cod_instrutor; m = (i + f) / 2){
         if (cod > intr[m].cod_instrutor)
@@ -303,48 +349,138 @@ void exclusao_instrutores (struct indice_instrutor idx[], struct Instrutores int
         cout << "Instrutor não cadastrado" << endl;
     }
     
-    cout << "\n\nInstrutores ainda ativos:\n";
-    for (int k = 0; k < cont; k++) {
-        if (intr[k].status == 0) { 
-            cout << "Código: " << intr[k].cod_instrutor << " | Nome: " << intr[k].nome << endl;
-        }
+    for (int i = 0; i < cont; i++) {
+		if (intr[i].status == 0) { 
+			cout << "\n\nInstrutores ainda ativos:\n";
+            cout << "Código: " << intr[i].cod_instrutor << " | Nome: " << intr[i].nome << endl;
+		}
+	}
+    
+}
+
+//MATRICULA =================================================
+
+
+void buscar_aluno(struct Aluno alu[], int &cont, int &cod_aluno, struct Cidade cid[]) {
+	for(int i = 0; i < cont; i++) {
+		if(cod_aluno == alu[i].cod_aluno) {
+			cout << "\n** ALUNO **" << endl;
+			cout << "Nome: " << alu[i].nome << endl;
+			cout << "Cidade: " << cid[i].nome << endl;
+		}
+		else {
+			cout << "\n** CÓDIGO DIGITADO NÃO EXISTE! **.";
+		}
+	}
+}
+
+void buscar_turma(struct Turma tur[], int &cont, int cod_turma, struct Curso cur[], struct Instrutores intr[]) {
+	for(int i = 0; i < cont; i++) {
+		if(cod_turma == tur[i].cod_turma) {
+			cout << "\n** TURMA **" << endl;
+			cout << "Nome do instrutor: " << intr[i].nome << endl;
+			cout << "Descrição do curso: " << cur[i].descricao << endl;
+			cout << "Valor por aula: " << cur[i].valor_por_aula << endl;
+		}
+		else {
+			cout << "\n** CÓDIGO DIGITADO NÃO EXISTE! **.";
+		}
+	}
+}
+
+void leitura_matricula(struct Matricula ma[], int &cont, Aluno alu[], int &cont_aluno, struct Cidade cid[], struct Instrutores intr[], struct Turma tur[], int &cont_turma, struct Curso cur[]) {
+	int i = 0;
+	for (int saida = 1; i < 20 && saida != 0; i++) {
+		cout << "\n\nCódigo da Matricula: ";
+		cin >> ma[i].cod_matricula;
+		if(ma[i].cod_matricula > 0) {
+			cout << "Código do aluno: ";
+			cin >> ma[i].cod_aluno;
+			cout << "Código da turma: ";
+			cin >> ma[i].cod_turma;
+			cout << "Quantidade de aulas: ";
+			cin >> ma[i].quant_aulas;
+			ma[i].status = 0;
+			
+			buscar_aluno(alu, cont_aluno, ma[i].cod_aluno, cid);
+			buscar_turma(tur, cont_turma, ma[i].cod_turma, cur, intr); 
+		}
+		else saida = 0;
+	}
+	cont = i - 1;
+}
+
+void leitura_indice_matricula (struct endMatricula idxM[], int contM){
+    for (int i = 0; i < contM; i++){
+        cout << "\n\nCodigo do Indice " << (i+1) << ": ";
+        cin >> idxM[i].cod_matricula;
+        cout << "Endereco Fisico na Area de Dados: ";
+        cin >> idxM[i].end_matricula;
     }
 }
 
-//==========================================================
+void inclusao_matriculas (struct Matricula ma[], int &cont, endMatricula idxM[], int contM, int cod, Aluno alu[], int &cont_aluno, struct Cidade cid[], struct Instrutores intr[], struct Turma tur[], int &cont_turma, struct Curso cur[]) {
+    // Inclusão do novo registro na área de dados
+    cout << "Código da matrícula: ";
+    cin >> ma[cont].cod_matricula;
+    cout << "Código do aluno: ";
+    cin >> ma[cont].cod_aluno;
+    cout << "Código da turma: ";
+    cin >> ma[cont].cod_turma;
+    cout << "Quantidade de aulas: ";
+    cin >> ma[cont].quant_aulas; 
+    
+    ma[cont].status = 0;
+    
+    // Inclusão na área de índices
+    int i;
+    for (i = contM - 1; i >= 0 && idxM[i].cod_matricula > cod; i--) {
+        idxM[i+1].cod_matricula = idxM[i].cod_matricula;
+        idxM[i+1].end_matricula = idxM[i].end_matricula;
+    }
+    idxM[i + 1].cod_matricula = cod;
+    idxM[i + 1].end_matricula = cont;
+    
+    cout << "\n\nInclusão realizada com Sucesso" << endl;
+
+    buscar_aluno(alu, cont_aluno, ma[cont].cod_aluno, cid);
+	buscar_turma(tur, cont_turma, ma[cont].cod_turma, cur, intr); 
+    
+    
+    cont++;
+    contM++;
+}
+
+void busca_aleat_matricula (struct Matricula ma[], int &cont, endMatricula idxM[], int contM, int cod, Aluno alu[], int &cont_aluno, struct Cidade cid[], int &cont_cidades, struct Instrutores intr[], struct Turma tur[], int &cont_turma, struct Curso cur[]){
+    int i = 0, f = cont - 1;
+    int m = (i + f) / 2;
+    for (; f >= i && cod != ma[m].cod_matricula; m = (i + f) / 2){
+        if (cod > ma[m].cod_matricula)
+            i = m + 1;
+        else
+            f = m - 1;
+    }
+    if (cod == ma[m].cod_matricula){
+    	if(ma[m].status == 0) {
+    		cout << "\n\n Instrutor já cadastrado - não pode ser cadastrado novamente!";
+			cout << "\nCódigo do instrutor: " << ma[m].cod_matricula;
+			cout << "\nNome do instrutor: " << ma[m].cod_aluno;
+			cout << "\nEndereço do instrutor: " << ma[m].cod_turma;
+			cout << "\nCódigo da cidade do instrutor: " << ma[m].quant_aulas;
+		
+			buscar_aluno(alu, cont_aluno, ma[m].cod_aluno, cid);
+			buscar_turma(tur, cont_turma, ma[m].cod_turma, cur, intr); 
+		}	
+    }
+	else {
+    	inclusao_matriculas(ma, cont, idxM, contM, cod, alu, cont_aluno, cid, intr, tur, cont_turma, cur);
+	}
+}
 
 
-struct Matricula {
-	int cod_matricula;
-	int cod_aluno;
-	int cod_turma;
-	int quant_aulas;
-	double valor_total;
-};
+//ALUNO =====================================================
 
-struct endMatricula {
-	int cod_matricula;
-	int end_matricula;
-};
-
-
-
-//==========================================================
-
-struct Aluno {
-	int cod_aluno;
-	string nome;
-	string endereco;
-	int cod_cidade;
-	int status;
-};
-
-struct endAluno {
-	int codigo;
-	int ender;
-};
-
-void leitura_Aluno(struct Aluno alu[], int &cont, struct Cidade cid[], int &cont_cidades) {
+void leitura_aluno(struct Aluno alu[], int &cont, struct Cidade cid[], int &cont_cidades) {
 	int i = 0;
 	for (int saida = 1; i < 20 && saida != 0; i++) {
 		cout << "\n\nCódigo do Aluno: ";
@@ -365,19 +501,18 @@ void leitura_Aluno(struct Aluno alu[], int &cont, struct Cidade cid[], int &cont
 	cont = i - 1;
 }
 
-void leitura_indice_aluno (struct endAluno idx[], int contT){
-    for (int i = 0; i < contT; i++){
+void leitura_indice_aluno (struct endAluno idxA[], int contA){
+    for (int i = 0; i < contA; i++){
         cout << "\n\nCodigo do Indice " << (i+1) << ": ";
-        cin >> idx[i].codigo;
+        cin >> idxA[i].codigo;
         cout << "Endereco Fisico na Area de Dados: ";
-        cin >> idx[i].ender;
+        cin >> idxA[i].ender;
     }
 }
 
-
-void inclusao_aluno(struct Aluno alu[], struct endAluno idxA[], int contA, int &cont, int cod, struct Cidade cid[], int &cont_cidades){
+void inclusao_aluno (struct Aluno alu[], endAluno idxA[], int contA, int &cont, int cod, struct Cidade cid[], int &cont_cidades){
     // inclusao do novo registro na area de dados
-    cout << "Código do aluno: ";
+    cout << "Código do Aluno: ";
     cin >> alu[cont].cod_aluno;
     cout << "Nome: ";
     cin >> alu[cont].nome;
@@ -390,22 +525,23 @@ void inclusao_aluno(struct Aluno alu[], struct endAluno idxA[], int contA, int &
     
     // inclusao na area de indices
     int i;
-    for (i = contA - 1; idxA[i].codigo > cod; i--){
+    for (i = contA - 1; i >= 0 && idxA[i].codigo > cod; i--){
         idxA[i+1].codigo = idxA[i].codigo;
         idxA[i+1].ender = idxA[i].ender;
     }
-    idxA[i+1].codigo = cod;
-    idxA[i+1].ender = cont;
+    idxA[i + 1].codigo = cod;
+    idxA[i + 1].ender = cont;
+    
+    cout << "\n\nInclusao realizada com Sucesso";
     
     buscar_cidades(cid, cont_cidades, alu[cont].cod_cidade);
     
-    cout << "\n\nInclusao realizada com Sucesso";
-	
-	cont++;
-	contA++;
-}   
+    cont++;
+    contA++;
+}
 
-void busca_aleat_aluno (struct Aluno alu[], struct endAluno idxA[], int contA, int &cont, int cod, struct Cidade cid[], int &cont_cidades){
+
+void busca_aleat_aluno (struct Aluno alu[], endAluno idxA[], int contA, int &cont, int cod, struct Cidade cid[], int &cont_cidades){
     int i = 0, f = cont - 1;
     int m = (i + f) / 2;
     for (; f >= i && cod != alu[m].cod_aluno; m = (i + f) / 2){
@@ -414,19 +550,29 @@ void busca_aleat_aluno (struct Aluno alu[], struct endAluno idxA[], int contA, i
         else
             f = m - 1;
     }
-    if (alu[m].cod_aluno == cod){
-        cout << "\n\n Aluno já cadastrado - não pode ser cadastrado novamente!";
-		cout << "\nCódigo do aluno: " << alu[m].cod_aluno;
-		cout << "\nNome do aluno: " << alu[m].nome;
-		cout << "\nEndereço do aluno: " << alu[m].endereco;
-		cout << "\nCódigo da cidade do aluno: " << alu[m].cod_cidade;
+    if (cod == alu[m].cod_aluno){
+    	if(alu[m].status == 1) {
+    		cout << "\n\n Instrutor estava excluído - será cadastrado novamente!" << endl;
+            inclusao_aluno(alu, idxA, contA, cont, cod, cid, cont_cidades);
+            
+		} else {
+    		cout << "\n\n Instrutor já cadastrado - não pode ser cadastrado novamente!";
+			cout << "\nCódigo do instrutor: " << alu[m].cod_aluno;
+			cout << "\nNome do instrutor: " << alu[m].nome;
+			cout << "\nEndereço do instrutor: " << alu[m].endereco;
+			cout << "\nCódigo da cidade do instrutor: " << alu[m].cod_cidade;
+		
+			buscar_cidades(cid, cont_cidades, alu[cont].cod_cidade);
+		}	
     }
-    else
-        inclusao_aluno(alu, idxA, contA, cont, cod, cid, cont_cidades);
+	
+	else {
+    	inclusao_aluno(alu, idxA, contA, cont, cod, cid, cont_cidades);
+	}
 }
 
 
-void exclusao_alunos (struct endAluno idxA[], struct Aluno alu[], int &cont, int cod, struct Matricula ma[], int &cont_matricula){
+void exclusao_aluno (struct endAluno idxA[], struct Aluno alu[], int &cont, int cod, struct Matricula ma[], int &cont_ma){
     int i = 0, f = cont;
     int m = (i + f) / 2;
     for (; f >= i && cod != idxA[m].codigo; m = (i + f) / 2){
@@ -438,7 +584,7 @@ void exclusao_alunos (struct endAluno idxA[], struct Aluno alu[], int &cont, int
     i = idxA[m].ender;
     if ((cod == idxA[m].codigo) && alu[i].status == 0){
     	bool possui_turma = false;
-        for (int j = 0; j < cont_matricula; j++) {
+        for (int j = 0; j < cont_ma; j++) {
             if (ma[j].cod_aluno == cod) {
                 possui_turma = true;
                 break;
@@ -446,22 +592,24 @@ void exclusao_alunos (struct endAluno idxA[], struct Aluno alu[], int &cont, int
         }
 
         if (possui_turma) {
-            cout << "\n\nErro: O aluno possui matriculas cadastradas e não pode ser excluído!" << endl;
+            cout << "\n\nErro: O instrutor possui turmas cadastradas e não pode ser excluído!" << endl;
         } else {
             // Excluir o instrutor
             alu[i].status = 1;
-            cout << "\n\nAluno excluído com sucesso" << endl;
+            cout << "\n\nInstrutor excluído com sucesso" << endl;
         }
     } else {
-        cout << "Aluno não cadastrado" << endl;
+        cout << "Instrutor não cadastrado" << endl;
     }
     
-    cout << "\n\nAlunos ainda ativos:\n";
-    for (int j = 0; j < cont; j++) {
-        if (alu[j].status == 0) { 
-            cout << "Código: " << alu[j].cod_aluno << " | Nome: " << alu[j].nome << endl;
-        }
-    }
+    
+    for (int i = 0; i < cont; i++) {
+		if (alu[i].status == 0) { 
+			cout << "\n\nAlunos ainda ativos:\n";
+            cout << "Código: " << alu[i].cod_aluno << " | Nome: " << alu[i].nome << endl;
+		}
+	}
+    
 }
 
 //==========================================================
@@ -500,12 +648,15 @@ int main() {
         cout << "| [3] - Leitura dos instrutores                      |"<< endl;
         cout << "| [4] - Leitura das turmas:                          |"<< endl;
         cout << "| [5] - Leitura dos Alunos:                          |"<< endl;
+        cout << "| [6] - Leitura dos Matriculas:                      |"<< endl;
         cout << "|----------------------------------------------------|"<< endl;
-        cout << "| [6] - Inclusão dos Instrutores:                    |"<< endl;
-        cout << "| [7] - Inclusão dos Alunos:                         |"<< endl;
+        cout << "| [7] - Inclusão dos Instrutores:                    |"<< endl;
+        cout << "| [8] - Inclusão dos Alunos:                         |"<< endl;
+        cout << "| [9] - Inclusão das turmas:                         |"<< endl;
+        cout << "| [10] - Inclusão das matriculas:                     |"<< endl;
         cout << "|----------------------------------------------------|"<< endl;
-        cout << "| [8] - Exclusão dos Instrutores:                    |"<< endl;
-        cout << "| [9] - Exclusão dos Alunos:                         |"<< endl;
+        cout << "| [11] - Exclusão dos Instrutores:                   |"<< endl;
+        cout << "| [12] - Exclusão dos Alunos:                        |"<< endl;
         cout << "-----------------------------------------------------"<< endl; 
         
         cout << "[0] - Sair" << endl;
@@ -534,18 +685,25 @@ int main() {
             case 4:
             	system("cls");
     			cout << "Leitura de Turmas: " << endl;
-    			leitura_turmas(tur, contadorTurmas, curs, contadorCurso);
+    			leitura_turmas(tur, contadorTurmas, curs, contadorCurso, intr, contadorInstrutor, cid);
     			leitura_indice_turma(idxT, contadorTurmas);
     			break;
     			
     		case 5:
     			system("cls");
     			cout << "leitura de Alunos:" << endl;
-    			leitura_Aluno(alu, contadorAluno, cid, contadorCidade);
+    			leitura_aluno(alu, contadorAluno, cid, contadorCidade);
     			leitura_indice_aluno(idxA, contadorAluno);
     			break;
+    			
+    		case 6:
+    			system("cls");
+    			cout << "Leitura de Matriculas:" << endl;
+    			leitura_matricula(ma, contadorMatricula, alu, contadorAluno, cid, intr, tur, contadorTurmas, curs);
+            	leitura_indice_matricula(idxM, contadorMatricula);
+            	break;
             	
-            case 6:
+            case 7:
             	system("cls");
             	cout << "Inclusão de instrutores:" << endl;
             	 for(long int codpesq = 9; codpesq != 0;){
@@ -556,7 +714,7 @@ int main() {
     			}
             	break;
             	
-    		case 7: 
+    		case 8: 
     			system("cls");
             	cout << "Inclusão de alunos:" << endl;
             	for(long int codAluno = 9; codAluno != 0;){
@@ -566,8 +724,32 @@ int main() {
             			busca_aleat_aluno(alu, idxA, contadorAluno, contadorAluno, codAluno, cid, contadorCidade);
     			}
             	break;
+            	
+            case 9:
+            	system("cls");
+            	cout << "Inclusão de turmas:" << endl;
+            	for(long int codTurma = 9; codTurma !=0;) {
+            		cout << "\n\nInforme o código do aluno a ser Incluido (0 para Encerrar)" << endl;
+            		cin >> codTurma;
+            		if(codTurma != 0) {
+            			inclusao_turma(tur, contadorTurmas, idxT, contadorTurmas, cod, curs, contadorCurso, intr, contadorCurso, cid);
+					}
+				}
+				break;
+				
+			case 10: 
+				system("cls");
+				cout << "Inclusão de matricula" << endl;
+				for(long int codMat = 9; codMat != 0;) {
+					cout << "\n\nInforme o código do aluno a ser Incluido (0 para Encerrar)" << endl;
+					cin >> codMat;
+					if(codMat != 0) {
+						inclusao_matriculas(ma, contadorMatricula, idxM, contadorMatricula, cod, alu, contadorAluno, cid, intr, tur, contadorTurmas, curs);
+					}
+				}
+				break;
     			
-    		case 8:
+    		case 11:
             	system("cls");
             	cout << "Exclusão de instrutores: " << endl;
             	for (int codex = 9; codex != 0;){
@@ -578,17 +760,16 @@ int main() {
     			}
     			break;
     			
-    		case 9:
+    		case 12:
     			system("cls");
     			cout << "Exclusão de alunos:" << endl;
     			for (int codex = 9; codex != 0;){
         		cout << "\n\nInforme o Codigo do Cliente a ser Exclu?do (0 para Encerrar): ";
         		cin >> codex;
         		if (codex != 0)
-            		exclusao_alunos(idxA, alu, contadorInstrutor, codex, ma, contadorMatricula);
+            		exclusao_aluno(idxA, alu, contadorAluno, codex, ma, contadorMatricula);
     			}
     			break;
 		}
 	}
 }
-	
